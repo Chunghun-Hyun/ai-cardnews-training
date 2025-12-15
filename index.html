@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10일차: 2주차 실습 & Q&A - AI 카드뉴스 제작 연수</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            padding: 60px 40px;
+            min-height: 500px;
+            position: relative;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .card.active {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 브라우저 스타일 장식 */
+        .browser-dots {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            letter-spacing: 8px;
+        }
+        
+        .browser-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: rgba(255,255,255,0.3);
+            font-size: 24px;
+        }
+        
+        /* 표지 카드 - 2주차 색상 */
+        .card-cover {
+            background: linear-gradient(135deg, #6DD5FA 0%, #2980B9 100%);
+            color: white;
+        }
+        
+        .card-cover h1 {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+        
+        .card-cover .subtitle {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+        
+        .card-cover .footer {
+            position: absolute;
+            bottom: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* 내용 카드 공통 */
+        h2 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #6DD5FA 0%, #2980B9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .content-box {
+            background: white;
+            border: 3px solid #6DD5FA;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .content-box h3 {
+            font-size: 20px;
+            color: #2980B9;
+            margin-bottom: 15px;
+        }
+        
+        .content-box p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .content-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .content-box li {
+            font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .content-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #6DD5FA;
+            font-weight: bold;
+        }
+        
+        /* 하이라이트 박스 */
+        .highlight-box {
+            background: linear-gradient(135deg, #6DD5FA 0%, #2980B9 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* 성취 카드 */
+        .card-achievement {
+            background: linear-gradient(135deg, #96e6ff 0%, #5fb3e8 100%);
+        }
+        
+        .achievement-box {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .achievement-box h3 {
+            font-size: 20px;
+            color: #2980B9;
+            margin-bottom: 15px;
+        }
+        
+        .achievement-box p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* 체크리스트 스타일 */
+        .checklist {
+            text-align: left;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .checklist-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checklist-item:before {
+            content: "☐ ";
+            color: #6DD5FA;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* 비교 테이블 */
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            width: 100%;
+        }
+        
+        .comparison-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        
+        .comparison-item {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .comparison-bad {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            color: #c53030;
+        }
+        
+        .comparison-good {
+            background: #f0f9ff;
+            border: 2px solid #6DD5FA;
+            color: #2980B9;
+        }
+        
+        /* 마무리 카드 */
+        .card-closing {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+        
+        .card-closing h1 {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 30px;
+        }
+        
+        .card-closing .message {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        
+        /* 리소스 링크 */
+        .resource-link {
+            color: #2980B9;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid #2980B9;
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 2px 0;
+        }
+        
+        .resource-link:hover {
+            color: #6DD5FA;
+            border-bottom-color: #6DD5FA;
+            transform: translateY(-1px);
+        }
+        
+        /* 네비게이션 */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #6DD5FA 0%, #2980B9 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(109, 213, 250, 0.3);
+            font-family: 'Malgun Gothic', sans-serif;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(109, 213, 250, 0.4);
+        }
+        
+        .nav-btn:active {
+            transform: translateY(0);
+        }
+        
+        .nav-btn:disabled {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .nav-btn:disabled:hover {
+            transform: none;
+        }
+        
+        /* 페이지 인디케이터 */
+        .page-indicator {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .page-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .page-dot.active {
+            background: linear-gradient(135deg, #6DD5FA 0%, #2980B9 100%);
+            width: 30px;
+            border-radius: 5px;
+        }
+        
+        .page-number {
+            font-size: 16px;
+            color: #2980B9;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+        
+        /* 키보드 힌트 */
+        .keyboard-hint {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #adb5bd;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .card {
+                padding: 50px 30px;
+                min-height: 500px;
+            }
+            
+            .card-cover h1 {
+                font-size: 36px;
+            }
+            
+            h2 {
+                font-size: 22px;
+            }
+            
+            .content-box {
+                padding: 20px;
+            }
+            
+            .nav-btn {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+            
+            .page-indicator {
+                gap: 6px;
+            }
+            
+            .page-dot {
+                width: 8px;
+                height: 8px;
+            }
+            
+            .page-dot.active {
+                width: 24px;
+            }
+            
+            .comparison-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- 카드 1: 표지 -->
+        <div class="card card-cover active">
+            <div class="browser-dots">○ ○ ○</div>
+            <div class="browser-close">×</div>
+            <h1>10일차<br>2주차<br>실습 & Q&A</h1>
+            <p class="subtitle">프롬프팅 마스터 완성! 🎉</p>
+            <div class="footer">AI 카드뉴스 제작 연수 10/19</div>
+        </div>
+
+        <!-- 카드 2: 축하 메시지 -->
+        <div class="card card-achievement">
+            <h2 style="color: #fff;">🎊 2주차 수료 축하합니다!</h2>
+            
+            <div class="achievement-box">
+                <h3>✨ 2주 전 우리는...</h3>
+                <p>• AI가 낯설었고<br>
+                • 프롬프트가 뭔지 몰랐고<br>
+                • 어떻게 질문해야 할지 막막했어요</p>
+            </div>
+            
+            <div class="achievement-box">
+                <h3>✨ 그런데 지금은...</h3>
+                <p>• AI와 대화할 수 있고<br>
+                • 원하는 결과를 이끌어낼 수 있고<br>
+                • 프롬프트를 개선할 수 있어요!</p>
+            </div>
+            
+            <div class="highlight-box">
+                이건 정말 큰 성장입니다! 👏👏👏
+            </div>
+        </div>
+
+        <!-- 카드 3: 2주차 학습 내용 정리 -->
+        <div class="card">
+            <h2>📚 2주차에 배운 것들</h2>
+            
+            <div class="content-box">
+                <h3>6일차 - 프롬프팅 기초</h3>
+                <p>역할-작업-조건 3요소를 배웠어요</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>7일차 - 텍스트 생성 프롬프팅</h3>
+                <p>카드뉴스 문구를 AI로 만들어봤어요</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>8일차 - 이미지 프롬프팅 기초</h3>
+                <p>AI 이미지 생성 도구를 알게 됐어요</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>9일차 - 프롬프트 개선하기</h3>
+                <p>결과가 안 좋을 때 대처법을 배웠어요</p>
+            </div>
+        </div>
+
+        <!-- 카드 4: 프롬프팅 3대 원칙 -->
+        <div class="card">
+            <h2>🎯 프롬프팅의 3대 원칙</h2>
+            
+            <div class="highlight-box">
+                1️⃣ 역할 지정
+            </div>
+            <div class="content-box">
+                <p>"너는 초등학교 선생님이야"</p>
+            </div>
+            
+            <div class="highlight-box">
+                2️⃣ 작업 명확히
+            </div>
+            <div class="content-box">
+                <p>"학부모 상담 주간 안내 카드뉴스<br>문구 5장 분량으로 써줘"</p>
+            </div>
+            
+            <div class="highlight-box">
+                3️⃣ 조건 추가
+            </div>
+            <div class="content-box">
+                <p>"각 슬라이드는 2-3문장,<br>친근한 말투로"</p>
+            </div>
+        </div>
+
+        <!-- 카드 5: 좋은 프롬프트 vs 아쉬운 프롬프트 -->
+        <div class="card">
+            <h2>💡 좋은 프롬프트 vs 아쉬운 프롬프트</h2>
+            
+            <div class="comparison-table">
+                <div class="comparison-row">
+                    <div class="comparison-item comparison-bad">
+                        <strong>❌ 아쉬운</strong><br>
+                        "카드뉴스 만들어줘"
+                    </div>
+                    <div class="comparison-item comparison-good">
+                        <strong>✅ 좋은</strong><br>
+                        "초등학생 대상 급식 알레르기 안내 카드뉴스 문구 5장"
+                    </div>
+                </div>
+                
+                <div class="comparison-row">
+                    <div class="comparison-item comparison-bad">
+                        <strong>❌ 아쉬운</strong><br>
+                        "이미지 만들어"
+                    </div>
+                    <div class="comparison-item comparison-good">
+                        <strong>✅ 좋은</strong><br>
+                        "초등학교 도서관 배경, 일러스트 스타일"
+                    </div>
+                </div>
+                
+                <div class="comparison-row">
+                    <div class="comparison-item comparison-bad">
+                        <strong>❌ 아쉬운</strong><br>
+                        "다시 써줘"
+                    </div>
+                    <div class="comparison-item comparison-good">
+                        <strong>✅ 좋은</strong><br>
+                        "첫 번째 슬라이드 제목을 질문 형태로"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카드 6: 프롬프트 개선 3단계 -->
+        <div class="card">
+            <h2>🔧 프롬프트 개선 3단계</h2>
+            
+            <div class="content-box">
+                <h3>1단계: 구체적으로</h3>
+                <p>"재밌게" → "초등학교 3학년이 이해할 수 있는 쉬운 단어로"</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>2단계: 예시 제공</h3>
+                <p>"이런 스타일로: (예시 문구 붙여넣기)"</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>3단계: 단계별 요청</h3>
+                <p>한 번에 다 말고, 하나씩 수정 요청하기</p>
+            </div>
+            
+            <div class="highlight-box">
+                이 3단계만 기억하면<br>프롬프팅 마스터! ⭐
+            </div>
+        </div>
+
+        <!-- 카드 7: 학습 체크리스트 -->
+        <div class="card">
+            <h2>📝 나의 학습 체크리스트</h2>
+            
+            <div class="content-box">
+                <h3>기본 이해</h3>
+                <div class="checklist">
+                    <div class="checklist-item">프롬프트가 무엇인지 설명할 수 있다</div>
+                    <div class="checklist-item">역할-작업-조건 3요소를 안다</div>
+                    <div class="checklist-item">AI 도구에 질문을 자신 있게 할 수 있다</div>
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h3>실습 경험</h3>
+                <div class="checklist">
+                    <div class="checklist-item">카드뉴스 문구를 AI로 생성해봤다</div>
+                    <div class="checklist-item">생성된 결과를 수정 요청해봤다</div>
+                    <div class="checklist-item">이미지 프롬프트를 작성해봤다</div>
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h3>실전 적용</h3>
+                <div class="checklist">
+                    <div class="checklist-item">내 주제로 프롬프트를 만들어봤다</div>
+                    <div class="checklist-item">결과가 마음에 안 들 때 개선해봤다</div>
+                    <div class="checklist-item">실제 사용할 만한 결과물을 얻었다</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카드 8: 자주 나온 질문들 -->
+        <div class="card">
+            <h2>❓ 자주 나온 질문들</h2>
+            
+            <div class="content-box">
+                <h3>Q1. 프롬프트가 너무 길어지는데?</h3>
+                <p>👉 괜찮아요! 명확하면 길어도 좋아요. 단, 가장 중요한 것부터 먼저 쓰세요.</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>Q2. AI가 이상한 답을 줘요</h3>
+                <p>👉 프롬프트를 바꿔보거나, "다시 작성해줘, 이번엔 ~하게"로 재요청하세요.</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>Q3. 예시를 주는 게 효과적인가요?</h3>
+                <p>👉 네! 예시는 AI에게 가장 명확한 지시예요. 1-2개만 줘도 달라져요.</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>Q4. 무료 버전으로도 충분한가요?</h3>
+                <p>👉 연수 내용은 무료 버전으로 충분해요!</p>
+            </div>
+        </div>
+
+        <!-- 카드 9: 3주차 예고 -->
+        <div class="card">
+            <h2>📢 다음 주: 3주차 HTML 카드뉴스</h2>
+            
+            <div class="highlight-box">
+                진짜 웹 카드뉴스를 만들어요! 🚀
+            </div>
+            
+            <div class="content-box">
+                <h3>11일차 (월) - HTML이 뭐예요?</h3>
+                <p>웹페이지의 기본 구조 이해하기<br>두려워하지 말아요, 생각보다 쉬워요!</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>12일차 (화) - AI가 코드를 만들어줘요</h3>
+                <p>"HTML 카드뉴스 만들어줘"라고 하면 끝!</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>13일차 (수) - 색상도 바꾸고 꾸며볼까요?</h3>
+                <p>AI에게 디자인 수정 요청하기</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>14일차 (목) - 직접 수정도 해봐요</h3>
+                <p>간단한 텍스트 바꾸기</p>
+            </div>
+        </div>
+
+        <!-- 카드 10: 3주차 준비물 -->
+        <div class="card">
+            <h2>💡 3주차 준비물</h2>
+            
+            <div class="content-box">
+                <h3>✅ 메모장 (Windows) 또는 TextEdit (Mac)</h3>
+                <p>이미 컴퓨터에 있어요!<br>찾아만 두세요</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>✅ 웹 브라우저 (Chrome, Edge, Safari 등)</h3>
+                <p>평소 쓰시는 브라우저면 충분해요</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>✅ 긍정적인 마음 😊</h3>
+                <p>"코드"라는 단어에 겁먹지 마세요!<br>AI가 다 만들어주고,<br>우리는 약간만 수정하면 돼요</p>
+            </div>
+            
+            <div class="highlight-box">
+                다음 주 월요일에<br>신나는 HTML 세계에서 만나요!
+            </div>
+        </div>
+
+        <!-- 카드 11: 질문 안내 -->
+        <div class="card">
+            <h2>💬 더 궁금한 점이 있나요?</h2>
+            
+            <div class="content-box" style="text-align: center;">
+                <h3>❓ 질문방</h3>
+                <p><a href="https://padlet.com/taeyang1001_2/2025-rewejd70ukndd8y5" target="_blank" class="resource-link">padlet.com/taeyang1001_2/2025-rewejd70ukndd8y5</a></p>
+                <p style="margin-top: 15px;">• 어떤 질문이든 환영해요!<br>
+                • 익명으로도 질문 가능해요<br>
+                • 오늘 밤까지 질문 남겨주시면,<br>내일 오전 정리해드릴게요</p>
+            </div>
+            
+            <div class="highlight-box">
+                주말 동안 잠깐이라도<br>AI와 놀아보세요!<br>"주말에 뭐 하지?"라고<br>물어보는 것도 연습이에요 ㅎㅎ 🎮
+            </div>
+        </div>
+
+        <!-- 카드 12: 마무리 -->
+        <div class="card card-closing">
+            <h1>Have a<br>Great<br>Weekend!</h1>
+            <p class="message">
+                완벽하지 않아도 괜찮습니다.<br>
+                시작했고, 여기까지 왔고,<br>
+                계속 나아가고 있다는 것만으로도<br>
+                충분히 훌륭합니다! 💙<br><br>
+                주말 잘 보내시고,<br>
+                월요일에 만나요! 🌟
+            </p>
+            <div class="footer">다음: 11일차 HTML 기초 이해</div>
+        </div>
+
+    </div>
+    
+    <!-- 네비게이션 -->
+    <div class="container">
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeCard(-1)">← 이전</button>
+            <div class="page-indicator" id="pageIndicator"></div>
+            <button class="nav-btn" id="nextBtn" onclick="changeCard(1)">다음 →</button>
+        </div>
+        <div class="keyboard-hint">
+            💡 키보드 ← → 방향키로도 이동할 수 있어요
+        </div>
+    </div>
+    
+    <script>
+        let currentCard = 0;
+        const cards = document.querySelectorAll('.card');
+        const totalCards = cards.length;
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageIndicator = document.getElementById('pageIndicator');
+        
+        // 페이지 인디케이터 생성
+        function createPageIndicator() {
+            pageIndicator.innerHTML = '';
+            for (let i = 0; i < totalCards; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'page-dot';
+                if (i === currentCard) {
+                    dot.classList.add('active');
+                }
+                dot.onclick = () => goToCard(i);
+                pageIndicator.appendChild(dot);
+            }
+            
+            // 페이지 번호 추가
+            const pageNum = document.createElement('span');
+            pageNum.className = 'page-number';
+            pageNum.textContent = `${currentCard + 1} / ${totalCards}`;
+            pageIndicator.appendChild(pageNum);
+        }
+        
+        // 카드 변경
+        function changeCard(direction) {
+            currentCard += direction;
+            
+            // 범위 체크
+            if (currentCard < 0) currentCard = 0;
+            if (currentCard >= totalCards) currentCard = totalCards - 1;
+            
+            showCard();
+        }
+        
+        // 특정 카드로 이동
+        function goToCard(index) {
+            currentCard = index;
+            showCard();
+        }
+        
+        // 카드 표시
+        function showCard() {
+            // 모든 카드 숨기기
+            cards.forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // 현재 카드 표시
+            cards[currentCard].classList.add('active');
+            
+            // 버튼 상태 업데이트
+            prevBtn.disabled = currentCard === 0;
+            nextBtn.disabled = currentCard === totalCards - 1;
+            
+            // 인디케이터 업데이트
+            createPageIndicator();
+            
+            // 페이지 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changeCard(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeCard(1);
+            }
+        });
+        
+        // 터치 스와이프 지원
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            if (touchStartX - touchEndX > 50) {
+                // 왼쪽으로 스와이프 (다음)
+                changeCard(1);
+            }
+            if (touchEndX - touchStartX > 50) {
+                // 오른쪽으로 스와이프 (이전)
+                changeCard(-1);
+            }
+        }
+        
+        // 초기화
+        showCard();
+    </script>
+</body>
+</html>
